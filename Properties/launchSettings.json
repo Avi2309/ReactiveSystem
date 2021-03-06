@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "ReactiveSystem": {
+      "commandName": "Project",
+      "commandLineArgs": "\"set\""
+    }
+  }
+}
