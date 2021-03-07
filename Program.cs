@@ -8,7 +8,7 @@ namespace ReactiveSystem
         static void Main(string[] args)
         {
             Console.WriteLine("Welcome to Reactive system !");
-            string fileName = @$"{args[0]}.txt";
+            string fileName = @$"{args[0]}";
             string initialSet = File.ReadAllText(fileName);
             var reactiveEngine = new ReactiveEngine(initialSet);
 
