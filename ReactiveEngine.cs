@@ -9,27 +9,15 @@ namespace ReactiveSystem
 {
     public class ReactiveEngine
     {
-        private readonly string _initialState;
         private List<Computed> _reactiveNodeList;
         public ReactiveEngine(string initialState)
         {
-            _initialState = initialState;
-            SetReactiveNodes();
+            SetReactiveNodes(initialState);
         }
 
-        public bool IsExpNode(string exp)
+        private void SetReactiveNodes(string initialState)
         {
-            if (exp.Trim().StartsWith("="))
-            {
-                return true;
-            }
-
-            return false;
-        }
-
-        private void SetReactiveNodes()
-        {
-            var nodes = _initialState.Split(',');
+            var nodes = initialState.Split(',');
             _reactiveNodeList = new List<Computed>();
             for (int i = 0; i < nodes.Length; i++)
             {
@@ -44,14 +32,7 @@ namespace ReactiveSystem
 
             _reactiveNodeList.ForEach(node =>
             {
-                if (IsExpNode(node.NodeVal))
-                {
-                    resComputedArray.Add((int)getComputedVal(i));
-                }
-                else
-                {
-                    resComputedArray.Add(int.Parse(_reactiveNodeList[i].NodeVal));
-                }
+                resComputedArray.Add((int)getComputedVal(i));
                 i++;
             });
 
@@ -60,15 +41,21 @@ namespace ReactiveSystem
 
         public int? getComputedVal(int index)
         {
-            if (IsExpNode(_reactiveNodeList[index].NodeVal))
+            if (_reactiveNodeList[index].ComputedVal != null)
+            {
+                return _reactiveNodeList[index].ComputedVal;
+            }
+
+            if (_reactiveNodeList[index].IsExpNode())
             {
                 var refIndexes = getIndexesListFromExp(_reactiveNodeList[index].NodeVal);
                 var exp = _reactiveNodeList[index].NodeVal;
                 refIndexes.ForEach(index => { 
                     var computed = getComputedVal(index);
+                    _reactiveNodeList[index].ComputedVal = computed;
                     exp = exp.Replace(string.Concat("{", index, "}"), computed.ToString());
                 });
-                var res = Convert.ToInt32(new DataTable().Compute(exp.Replace("=",string.Empty), null));
+                var res = Helper.computeExp(exp);
                 return res;
             }
             else
